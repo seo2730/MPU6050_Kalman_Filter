@@ -2,6 +2,9 @@
 Using MPU6050 and check roll,pitch in MATLAB<br>
 MPU6050 Source Code : https://github.com/jarzebski/Arduino-MPU6050<br>
 
+# Youtube
+https://youtu.be/q7tEVQ5Mq8Y
+
 # Arduino(itself) Kalman Filter
 not completed
 
