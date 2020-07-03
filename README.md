@@ -37,7 +37,7 @@ MPU6050_MATLAB 파일에는 서로 통신을 위한 아두이노 파일과 매�
       q = str2double(split_data(1,5));
       r = str2double(split_data(1,6));
       
-- Results changing covariance(Up : Roll, below : Pitch)
+- Results changing covariance(Up : Roll, below : Pitch)<br>
 R : 10<br>
 
 ![KakaoTalk_20200703_165557049](https://user-images.githubusercontent.com/42115807/86472187-bc88dd00-bd79-11ea-80e8-7e417bbd978d.png)
