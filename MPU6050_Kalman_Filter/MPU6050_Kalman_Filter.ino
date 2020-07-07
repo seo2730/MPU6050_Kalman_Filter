@@ -134,9 +134,9 @@ void loop()
 
   //A 행렬
   A[0][0]=1; A[0][1]=-timeStep*0.5*normGyro.XAxis; A[0][2]=-timeStep*0.5*normGyro.YAxis; A[0][3]=-timeStep*0.5*normGyro.ZAxis;
-  A[1][0]=timeStep*0.5*normGyro.XAxis; A[0][1]=1; A[0][2]=timeStep*0.5*normGyro.ZAxis; A[0][3]=-timeStep*0.5*normGyro.YAxis;
-  A[2][0]=timeStep*0.5*normGyro.YAxis; A[0][1]=-timeStep*0.5*normGyro.ZAxis; A[0][2]=1; A[0][3]=timeStep*0.5*normGyro.XAxis;
-  A[3][0]=timeStep*0.5*normGyro.ZAxis; A[0][1]=timeStep*0.5*normGyro.YAxis; A[0][2]=-timeStep*0.5*normGyro.XAxis; A[0][3]=1;
+  A[1][0]=timeStep*0.5*normGyro.XAxis; A[1][1]=1; A[1][2]=timeStep*0.5*normGyro.ZAxis; A[1][3]=-timeStep*0.5*normGyro.YAxis;
+  A[2][0]=timeStep*0.5*normGyro.YAxis; A[2][1]=-timeStep*0.5*normGyro.ZAxis; A[2][2]=1; A[2][3]=timeStep*0.5*normGyro.XAxis;
+  A[3][0]=timeStep*0.5*normGyro.ZAxis; A[3][1]=timeStep*0.5*normGyro.YAxis; A[3][2]=-timeStep*0.5*normGyro.XAxis; A[3][3]=1;
 
   EulerToQuaternion(acc_roll,acc_pitch,0);
   EulerKalman();
@@ -208,27 +208,73 @@ void EulerToQuaternion(double phi, double theta, double psi)
 void EulerKalman()
 {
   ///////// xp = A*x; /////////////
-
-
+  for(int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+      xp[i][0] += A[i][j]*x[j][0];
+           
   ///////// Pp = A*P*A' + Q; /////////////
+  for (int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+      A_trans[i][j] = A[j][i];  
+      
+  for(int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+      for(int k=0;k<4;k++)
+        PA_trans[i][j] += P[i][k]*A_trans[k][j];
 
+  for(int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+      for(int k=0;k<4;k++)
+        APA_trans[i][j] += A[i][k]*PA_trans[k][j];    
 
+  for(int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+      Pp[i][j] = APA_trans[i][j] + Q[i][j];
+  
   ///////// K = Pp*H'*(H*Pp*H'+R)^-1; /////////////
+    // 행렬 덧셈
+  for(int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+      M[i][j] = Pp[i][j] + R[i][j];
+     
+    //역행렬
+  //InvMatrix(4,(double*)M,(double*)inv_M);
 
+    // 행렬 곱셈  
+  for(int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+      for(int k=0;k<4;k++)
+        K[i][j] += Pp[i][k]*inv_M[k][j];
 
 
   ///////// x = xp + K*(z - H*xp); /////////////
-
+  for(int i=0;i<4;i++)
+     z[i][0] = q[i] - xp[i][0];
+    
+  for(int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+        zK[i][0] += K[i][j]*z[j][0];  
+ 
+  for(int i=0;i<4;i++)
+      x[i][0] = xp[i][0] + zK[i][0];
 
   ///////// P = Pp - K*H*Pp; /////////////
+  for(int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+      for(int k=0;k<4;k++)
+        Pp_K[i][j] += K[i][k]*Pp[k][j];
 
-
+  for(int i=0;i<4;i++)
+    for(int j=0;j<4;j++)
+      P[i][j] = Pp[i][j] - Pp_K[i][j];
 
   roll = atan2(2*(x[3][0]*x[4][0] + x[1][0]*x[2][0]) , 1-2*(x[2][0]*x[2][0] + x[3][0]*x[3][0]))*180.0/M_PI;
   pitch = -asin(2*(x[2][0]*x[4][0] - x[1][0]*x[3][0]))*180.0/M_PI;
 }
 
-int InvMatrix(int n, const double* A, double* b)  // 역행렬 구하는 함수
+
+// 역행렬 구하는 함수
+int InvMatrix(int n, const double* A, double* b)  
 {
     double m;
     register int i, j, k;
