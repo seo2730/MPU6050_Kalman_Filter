@@ -2,7 +2,7 @@
 clc
 clear
 
-Nsamples = 1000;
+Nsamples = 500;
 
 dt = 0.1;
 
@@ -10,9 +10,9 @@ clear s
 n=1;
 
 while n<=Nsamples
-    s = serialport("COM13",115200,"Timeout",60);
+    s = serialport("COM3",115200,"Timeout",60);
     configureTerminator(s,"CR");
-    data = readline(s);
+    data = readline(s)
     split_data = strsplit(data,', ');
     
     a = str2double(split_data(1,1:3));
@@ -21,13 +21,15 @@ while n<=Nsamples
     r = str2double(split_data(1,6));
     
     A = eye(4) + dt*1/2*[0, -p, -q, -r;
-                        p   0  r   -q;
-                        q   -r   0  p;
-                        r  q   -p   0];
+                         p,  0,  r, -q;
+                         q, -r,  0,  p;
+                         r,  q, -p,  0];
+                    
     [phi1, theta1] = EulerAccel(a(1,1),a(1,2));
     z = EulerToQuaternion(phi1,theta1,0);
                     
     [phi, theta, psi] = EulerKalman(A,z);
+    
     AccelSaved(n,:) = [phi1, theta1];
     EulerSaved(n,:) = [phi, theta, psi];
     
