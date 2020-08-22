@@ -57,3 +57,6 @@ R : 0.01<br>
 
 ![KakaoTalk_20200703_182045748](https://user-images.githubusercontent.com/42115807/86472507-39b45200-bd7a-11ea-87cf-8679349e8158.png)
 ![KakaoTalk_20200703_182045849](https://user-images.githubusercontent.com/42115807/86472514-3c16ac00-bd7a-11ea-9ec9-2d7fbf5060f5.png)<br>
+<br>
+**Warning**
+센서가 싸구려라서 값이 계속 이상하게 바뀌는 현상이 있다.
