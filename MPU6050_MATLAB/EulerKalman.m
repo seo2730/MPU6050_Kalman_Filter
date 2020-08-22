@@ -7,8 +7,8 @@ persistent firstRun
 if isempty(firstRun)
     H = eye(4);
     
-    Q = 0.1*eye(4); % 공분산
-    R = 0.01*eye(4);   % 공분산 
+    Q = 5*eye(4); % 공분산
+    R = 0.5*eye(4);   % 공분산 
     
     x = [1 0 0 0]';
     P = 1*eye(4);
